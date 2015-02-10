@@ -45,21 +45,64 @@ public class ImageProcess{
 		   //Imgproc.blur(img, img, new Size(3,3));
 		   
 		   Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2HSV);
-		   /*
+		   
 		   
 		   Imgproc.threshold(img, img, 127 , 130 , Imgproc.THRESH_BINARY);
+		   
+		   int low = 10;
+		   int high = 255;
+		   
+		   Core.inRange(img, new Scalar(0, 0, 0), new Scalar(10, 10, 10), img);
+		   
+		   Imgproc.erode(img, img, new Mat());
+		   
+		   //Imgproc.blur(img, img, new Size(3,3));
 		   
 		   //Imgproc.Canny(img, img, 100, 100);
 		   
 		   Imgproc.Canny(img, img, 1, 60);
 		   
-		   Mat lines = new Mat();
+//		   Mat corners = new Mat();
+//		   
+//		   Imgproc.cornerHarris(img,corners,2,3,0.04,1);
+//		   
+//		   Core.normalize(corners, corners, 0, 255, Core.NORM_MINMAX,CvType.CV_32FC1, new Mat());
+//		   Core.convertScaleAbs(corners, corners);
+//		   
+//		   int thresh = 75;
+//		   
+//		   double[] pixelIntensity = new double[corners.depth()];
+//		   
+//		   for(int i = 0; i<corners.rows(); i++){
+//			   for (int j = 0; j < corners.cols(); j++){
+//				   pixelIntensity = corners.get(i, j) ; 
+//				   if ((pixelIntensity[0]) > thresh){
+//					   Core.circle(img, new Point(j, i) ,9, new Scalar(255,0,0));
+//				   }
+//			   }
+//		   }
 		   
-		   Imgproc.HoughLinesP(img ,lines, 1, Math.PI/180, 70, 50, 10);
+		   Mat lines = new Mat();
+//		   if (true){
+//			   return img;
+//		   }
+		   Imgproc.HoughLinesP(img ,lines, 1, Math.PI/180, 10, 1,10);
+		   
+		   System.out.println("" + lines.get(0,0)[0] + "" + lines.get(0,0)[1] + "" + lines.get(0,0)[2] +"" + lines.get(0,0)[3]);
+		   
+		   Mat linesOut = new Mat(img.height(),img.width(),CvType.CV_8UC1);
+		   
+		   
 		   
 		   for(int i = 0; i < lines.cols();  i++){
 			   double[] vec1 = lines.get(0, i);
 			   double[] vecA = new double[4];
+			   
+			   
+			   Core.line(linesOut, new Point(lines.get(0,i)[0], lines.get(0,i)[1]),
+					   new Point(lines.get(0,i)[2], lines.get(0,i)[3]),
+					   new Scalar(255,0,0,20));
+			   
 			   
 			   vecA[0] = 0;
 		       vecA[1] = (vec1[1] - vec1[3]) / (vec1[0] - vec1[2]) * -vec1[0] + vec1[1];
@@ -89,12 +132,12 @@ public class ImageProcess{
 			       
 			   }
 		   }
-		   /*
+		   
 		   for(int i = 0;i<intersectionsX.size();i++){
 			   Core.circle(img, new Point(intersectionsX.get(i),intersectionsY.get(i)),9, new Scalar(255,0,0));
 		   }
-		   */
-		   return img;
+		   
+		   return linesOut;
 		   
 
 	   }
