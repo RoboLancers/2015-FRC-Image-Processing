@@ -44,26 +44,33 @@ public class ImageProcess{
 		   //Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2GRAY);	
 		   //Imgproc.blur(img, img, new Size(3,3));
 		   
+		   // Convert image to HSV space for thresholding
 		   Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2HSV);
 		   
-		   
-		   Imgproc.threshold(img, img, 127 , 130 , Imgproc.THRESH_BINARY);
+		   // Old thresholding function - DOESN'T WORK ON COLOR IMAGES
+		   //Imgproc.threshold(img, img, 127 , 130 , Imgproc.THRESH_BINARY);
 		   
 		   int low = 10;
 		   int high = 255;
-		   
+		   // Actual thresholding function, inputs are image in, min(H,S,V), max(H,S,V), image out
+		   // Because we are looking for a silver/gray target, all values are very low
+		   // For values, refer to http://en.wikipedia.org/wiki/HSL_and_HSV
+		   // If we use green LEDs, will need to retune this. Change hue range to green, saturation and value high
 		   Core.inRange(img, new Scalar(0, 0, 0), new Scalar(10, 10, 10), img);
 		   
+		   // Remove small chunks such as shadow of the box
 		   Imgproc.erode(img, img, new Mat());
 		   
 		   //Imgproc.blur(img, img, new Size(3,3));
 		   
 		   //Imgproc.Canny(img, img, 100, 100);
 		   
+		   // Find edges - low threshold and high threshold (high threshold should actually be around 3*low threshold)
+		   // FIX THIS
 		   Imgproc.Canny(img, img, 1, 60);
 		   
 //		   Mat corners = new Mat();
-//		   
+//		   // Use this for corner detection - but too many stray corners to get rid of
 //		   Imgproc.cornerHarris(img,corners,2,3,0.04,1);
 //		   
 //		   Core.normalize(corners, corners, 0, 255, Core.NORM_MINMAX,CvType.CV_32FC1, new Mat());
@@ -81,11 +88,14 @@ public class ImageProcess{
 //				   }
 //			   }
 //		   }
-		   
+
+		   // Detect lines in edge map, should get the edges of the L's quite well		   
 		   Mat lines = new Mat();
 //		   if (true){
 //			   return img;
 //		   }
+		   // Inputs are input image, output lines, min length resolution, minimum angle resolution (currently 1 degree), 
+		   // threshold, min line length, min line gap before it's two lines
 		   Imgproc.HoughLinesP(img ,lines, 1, Math.PI/180, 10, 1,10);
 		   
 		   System.out.println("" + lines.get(0,0)[0] + "" + lines.get(0,0)[1] + "" + lines.get(0,0)[2] +"" + lines.get(0,0)[3]);
@@ -98,7 +108,7 @@ public class ImageProcess{
 			   double[] vec1 = lines.get(0, i);
 			   double[] vecA = new double[4];
 			   
-			   
+			   // Draw lines on image to visualize	   
 			   Core.line(linesOut, new Point(lines.get(0,i)[0], lines.get(0,i)[1]),
 					   new Point(lines.get(0,i)[2], lines.get(0,i)[3]),
 					   new Scalar(255,0,0,20));
